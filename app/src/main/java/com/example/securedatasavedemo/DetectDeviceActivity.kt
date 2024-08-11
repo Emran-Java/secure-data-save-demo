@@ -65,7 +65,7 @@ class DetectDeviceActivity : AppCompatActivity() {
                 || Build.PRODUCT.contains("simulator")
 
         if (result) {
-            finish()
+           // finish()
         }
     }
     private fun isDeviceRooted(): Boolean {

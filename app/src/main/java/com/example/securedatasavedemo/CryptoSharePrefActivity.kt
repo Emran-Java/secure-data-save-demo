@@ -84,7 +84,7 @@ class CryptoSharePrefActivity : AppCompatActivity() {
     fun storeSecrateData(saveData:String){
         // Store a key
         sharedPreferences?.edit()?.putString("keyAlias", saveData)?.apply()
-
+//        editor.putString("encrypted_data", encryptedData.joinToString("") { "%02x".format(it) })
     }
 
     fun retriveVal():String{
@@ -112,4 +112,88 @@ class CryptoSharePrefActivity : AppCompatActivity() {
         return cipher.doFinal(encryptedData)
     }
 
+    //try for test
+    fun storeEncryptedData(context: Context, encryptedData: ByteArray, iv: ByteArray) {
+//        val masterKey = MasterKey.Builder(context)
+//            .setKeyScheme(MasterKey.KeyScheme.AES256_SIV)
+//            .build()
+
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+
+
+        val sharedPreferences = EncryptedSharedPreferences.create(
+            "encrypted_prefs",
+            masterKeyAlias,
+            context,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        val editor = sharedPreferences.edit()
+        editor.putString("encrypted_data", encryptedData.joinToString("") { "%02x".format(it) })
+        editor.putString("iv", iv.joinToString("") { "%02x".format(it) })
+        editor.apply()
+    }
 }
+
+/*
+code sample
+import android.content.Context;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
+public class SecurePrefsManager {
+
+    private static final String SHARED_PREFS_FILE = "secure_shared_prefs";
+    private SharedPreferences encryptedSharedPreferences;
+
+    public SecurePrefsManager(Context context) throws GeneralSecurityException, IOException {
+        // Generate or retrieve the Master Key for encryption
+        String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+
+        // Initialize EncryptedSharedPreferences
+        encryptedSharedPreferences = EncryptedSharedPreferences.create(
+                SHARED_PREFS_FILE,
+                masterKeyAlias,
+                context,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        );
+    }
+
+    public void saveData(String key, String value) {
+        SharedPreferences.Editor editor = encryptedSharedPreferences.edit();
+        editor.putString(key, value);
+        editor.apply(); // Or editor.commit() if you prefer synchronous
+    }
+
+    public String getData(String key) {
+        return encryptedSharedPreferences.getString(key, null);
+    }
+
+    public static void main(String[] args) {
+        // This method is for demonstration purposes. In a real Android app, you would call these methods from an Activity or Service.
+        Context context = null; // You would get the actual context in an Android app
+
+        try {
+            SecurePrefsManager securePrefsManager = new SecurePrefsManager(context);
+
+            // Save encrypted data
+            securePrefsManager.saveData("username", "mySecureUsername");
+
+            // Retrieve encrypted data
+            String retrievedData = securePrefsManager.getData("username");
+            System.out.println("Decrypted Data: " + retrievedData);
+
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+*
+*
+* */

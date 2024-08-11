@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SecureDataSaveDemo"
         tools:targetApi="31">
+
+        <activity
+            android:name=".SEServiceTestActivity"
+            android:exported="false" />
+
         <activity
             android:name=".DetectDeviceActivity"
             android:exported="true">
@@ -24,11 +29,14 @@
         <activity
             android:name=".CryptoSharePrefActivity"
             android:exported="true">
-           <!-- <intent-filter>
+
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
         </activity>
     </application>
 
